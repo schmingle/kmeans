@@ -5,8 +5,10 @@
 
 #define LINE_SIZE 80
 #define BIG_NUMBER 999999999
-#define datax(i) data_points[i * 2]
-#define datay(i) data_points[i * 2 + 1]
+
+#define datax(i)        data_points[i * 2]
+#define datay(i)        data_points[i * 2 + 1]
+#define distance(i, j)  (datax(j) - datax(i)) * (datax(j) - datax(i)) + (datay(j) - datay(i)) * (datay(j) - datay(i))
 
 typedef struct {
   int    centroid_id;
@@ -25,7 +27,6 @@ void setup_data_points();
 void setup_centroids();
 void setup_assignments();
 
-double distance(int from_point_id, int to_point_id);
 void update_assignments();
 
 
@@ -64,11 +65,6 @@ void update_assignments()
   }
 }
 
-double distance(int from_point_id, int to_point_id)
-{
-  return (datax(to_point_id) - datax(from_point_id)) * (datax(to_point_id) - datax(from_point_id))
-    + (datay(to_point_id) - datay(from_point_id)) * (datay(to_point_id) - datay(from_point_id));
-}
 
 void setup_data_points()
 {
