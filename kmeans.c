@@ -12,14 +12,15 @@
 
 typedef struct {
   int    centroid_id;
-  double distance;
+  int    distance;
+  char   assigned;
 } assignment;
 
 char *input_file_name;
 int num_points;
 int num_clusters;
 int *centroids;
-double *data_points;
+int *data_points;
 assignment *point_assignments;
 
 
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 
 void update_assignments()
 {
-  double min_dist;
+  int min_dist;
   int min_centroid;
   for (int i = 0; i < num_points; i++) {
     for (int j = 0, d; j < num_clusters; j++) {
@@ -60,11 +61,11 @@ void update_assignments()
         min_dist = d;
         min_centroid = j;
       }
-//      printf("point %d (%.1lf, %.1lf) to centroid %d (%.1lf, %.1lf), min_dist: %.1lf, min_centroid: %d (%.1lf, %.1lf)\n", i, datax(i), datay(i), j, datax(centroids[j]), datay(centroids[j]), min_dist, min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]));
+      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, min_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j]), datay(centroids[j]), min_dist, min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]));
     }
     point_assignments[i].centroid_id = min_centroid;
     point_assignments[i].distance = min_dist;
-    printf("point %d (%.1lf, %.1lf) => centroid %d (%.1lf, %.1lf), distance: %.1lf\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]), min_dist);
+    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]), min_dist);
   }
 }
 
@@ -75,20 +76,20 @@ void setup_data_points()
   char line[LINE_SIZE];
 
   // allocate data array
-  data_points = (double *)calloc(num_points * 2, sizeof(double));
+  data_points = (int *)calloc(num_points * 2, sizeof(int));
 
   // read data from file into array
   file = fopen(input_file_name, "rt");
   for (int i = 0; i < num_points; i++) {
     fgets(line, LINE_SIZE, file);
-    sscanf(line, "%lf,%lf", &datax(i), &datay(i));
+    sscanf(line, "%d,%d", &datax(i), &datay(i));
   }
   fclose(file);
 
-//  // check values
-//  for (int i = 0; i < num_points; i++) {
-//    printf("data[%d] = %lf, %lf\n", i / 2, datax(i), datay(i));
-//  }
+  // check values
+  for (int i = 0; i < num_points; i++) {
+    printf("data[%d] = %d, %d\n", i / 2, datax(i), datay(i));
+  }
 }
 
 void setup_assignments()
@@ -107,10 +108,10 @@ void setup_centroids()
     centroids[i] = j;
   }
 
-//  // check values
-//  for (int i = 0; i < num_clusters; i++) {
-//    printf("centroids[%d] = %lf, %lf\n", i, datax(centroids[i]), datay(centroids[i]));
-//  }
+  // check values
+  for (int i = 0; i < num_clusters; i++) {
+    printf("centroids[%d] = %d, %d\n", i, datax(centroids[i]), datay(centroids[i]));
+  }
 }
 
 
