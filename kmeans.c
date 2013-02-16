@@ -3,6 +3,7 @@
 //#include <assert.h>
 //#include <float.h>
 #include <math.h>
+#include <time.h>
 
 #define LINE_SIZE 80
 #define BIG_NUMBER 999999999
