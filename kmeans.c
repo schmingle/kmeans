@@ -16,13 +16,19 @@ ASSUMPTIONS:
 #include <math.h>
 #include <time.h>
 
-#define LINE_SIZE 80
-#define BIG_NUMBER 999999999
+#define LINE_SIZE  80
+#define BIG_NUM    999999999
+#define FALSE      0
+#define TRUE       1
 
 #define uint            unsigned int
 #define datax(i)        data_points[i * 2]
 #define datay(i)        data_points[i * 2 + 1]
 #define distance(i, j)  (datax(j) - datax(i)) * (datax(j) - datax(i)) + (datay(j) - datay(i)) * (datay(j) - datay(i))
+#define is_assigned(i)  point_assignments[i].assigned
+#define set_assigned(i) point_assignments[i].assigned = TRUE
+#define assign(i, c)    point_assignments[i].centroid_id = c
+
 
 typedef struct {
   uint centroid_id;
@@ -102,36 +108,57 @@ void setup_data_points()
 
 //  // check values
 //  for (uint i = 0; i < num_points; i++) {
-//    printf("data[%d] = %d, %d\n", i / 2, datax(i), datay(i));
+//    printf("data[%d] = %d, %d\n", i, datax(i), datay(i));
 //  }
 }
 
 void setup_assignments()
 {
   point_assignments = (assignment *)calloc(num_points, sizeof(assignment));
+
+//  // check values
+//  for (uint i = 0; i < num_points; i++) {
+//    printf("assignments[%d]: centroid_id = %d, distance = %d, assigned = %d\n", i, point_assignments[i].centroid_id, point_assignments[i].distance, point_assignments[i].assigned);
+//  }
 }
 
 void setup_centroids()
 {
+  uint i, j, k, x, y;
+
   // allocate centroids array
   centroids = (uint *)calloc(num_clusters, sizeof(uint));
 
   // pick starting centroids, ensuring uniqueness
   srand((unsigned)time(NULL));
-  uint i = 0;
-  for (uint j = 0; i < num_clusters && j < num_points; j++) {
-    // grab first one
-    if (i == 0) {
-      centroids[i++] = j;
-    }
-    // otherwise, look for the next unique one
-    else if (datax(centroids[i - 1]) != datax(j) || datay(centroids[i - 1]) != datay(j)) {
-      centroids[i++] = j;
+  for (i = 0; i < num_clusters; ) {
+    // grab a random data point
+    j = random() % num_points;
+
+    // take if first one or unassigned
+    if (i == 0 || !is_assigned(j)) {
+      centroids[i] = j;
+
+      // mark this point (and all points like it) as assigned;
+      // this traversal works because we know the data set is sorted
+      x = datax(j);
+      y = datay(j);
+      for (k = j; k < num_points && x == datax(k) && y == datay(k); k++)
+        set_assigned(k);
+      for (k = j; k-- > 0 && x == datax(k) && y == datay(k); )
+        set_assigned(k);
+
+      // on to next centroid
+      i++;
     }
   }
 
+//  // check values
+//  for (uint i = 0; i < num_points; i++) {
+//    printf("assignments[%d]: centroid_id = %d, distance = %d, assigned = %d\n", i, point_assignments[i].centroid_id, point_assignments[i].distance, point_assignments[i].assigned);
+//  }
+
   // it's possible that the actual number of clusters is less than asked for
-//  printf("clusters found: %d\n", i);
   if (i < num_clusters)
     num_clusters = i;
 
