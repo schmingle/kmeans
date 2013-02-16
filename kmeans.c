@@ -1,3 +1,16 @@
+/*
+
+
+
+ASSUMPTIONS:
+
+- data points are 2D
+- data points are positive integers
+- data points are sorted
+
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -14,6 +27,7 @@
 typedef struct {
   uint centroid_id;
   uint distance;
+  char assigned;
 } assignment;
 
 char *input_file_name;
@@ -40,8 +54,8 @@ int main(int argc, char **argv)
 //  printf("file: %s, num_points: %d, num_clusters: %d\n", argv[1], num_points, num_clusters);
 
   setup_data_points();
-  setup_centroids();
   setup_assignments();
+  setup_centroids();
 
 
   update_assignments();
