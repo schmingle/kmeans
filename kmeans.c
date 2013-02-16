@@ -102,11 +102,24 @@ void setup_centroids()
   // allocate centroids array
   centroids = (uint *)calloc(num_clusters, sizeof(uint));
 
-  // pick starting centroids
+  // pick starting centroids, ensuring uniqueness
   srand((unsigned)time(NULL));
-  for (uint i = 0, d = num_points / num_clusters, j = d / 2; i < num_clusters; i++, j += d) {
-    centroids[i] = j;
+  uint i = 0;
+  for (uint j = 0; i < num_clusters && j < num_points; j++) {
+    // grab first one
+    if (i == 0) {
+      centroids[i++] = j;
+    }
+    // otherwise, look for the next unique one
+    else if (datax(centroids[i - 1]) != datax(j) || datay(centroids[i - 1]) != datay(j)) {
+      centroids[i++] = j;
+    }
   }
+
+  // it's possible that the actual number of clusters is less than asked for
+//  printf("clusters found: %d\n", i);
+  if (i < num_clusters)
+    num_clusters = i;
 
 //  // check values
 //  for (uint i = 0; i < num_clusters; i++) {
