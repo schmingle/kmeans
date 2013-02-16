@@ -23,6 +23,7 @@ ASSUMPTIONS:
 #define TRUE       1
 
 #define uint             unsigned int
+#define uint64           unsigned long
 #define datax(i)         data_points[i * 2]
 #define datay(i)         data_points[i * 2 + 1]
 #define distance(i, j)   (datax(j) - datax(i)) * (datax(j) - datax(i)) + (datay(j) - datay(i)) * (datay(j) - datay(i))
@@ -33,15 +34,16 @@ ASSUMPTIONS:
 
 
 typedef struct {
-  uint   point_id;
-  double mean_x;
-  double mean_y;
+  uint    point_id;
+  uint    num_points;
+  uint64  sum_x;
+  uint64  sum_y;
 } centroid;
 
 typedef struct {
-  uint centroid_id;
-  uint distance;
-  char assigned;
+  uint  centroid_id;
+  uint  distance;
+  char  assigned;
 } assignment;
 
 char *input_file_name;
@@ -81,40 +83,47 @@ int main(int argc, char **argv)
 void update_assignments()
 {
   uint i, j, c, d;
-  uint min_dist, min_centroid;
+  uint min_dist, nearest_centroid;
 
+  // clear out centroids
+  for (i = 0; i < num_clusters; i++) {
+    centroids[i].num_points = 0;
+    centroids[i].sum_x = 0;
+    centroids[i].sum_y = 0;
+  }
+
+  // for each data point...
   for (i = 0; i < num_points; i++) {
-    for (j = 0, d; j < num_clusters; j++) {
+    // find nearest centroid
+    for (j = 0; j < num_clusters; j++) {
       d = distance(i, centroids[j].point_id);
       if (j == 0 || min_dist > d) {
         min_dist = d;
-        min_centroid = j;
+        nearest_centroid = j;
       }
 
       #ifdef DEBUG
-      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, min_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j].point_id), datay(centroids[j].point_id), min_dist, min_centroid, datax(centroids[min_centroid].point_id), datay(centroids[min_centroid].point_id));
+      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, nearest_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j].point_id), datay(centroids[j].point_id), min_dist, nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id));
       #endif
     }
-    point_assignments[i].centroid_id = min_centroid;
+
+    // assign point to centroid
+    point_assignments[i].centroid_id = nearest_centroid;
     point_assignments[i].distance = min_dist;
 
+    // update centroid stats
+    centroids[nearest_centroid].sum_x += datax(i);
+    centroids[nearest_centroid].sum_y += datay(i);
+    centroids[nearest_centroid].num_points++;
+
     #ifdef DEBUG
-    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid].point_id), datay(centroids[min_centroid].point_id), min_dist);
+    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id), min_dist);
     #endif
   }
 
   #ifdef DEBUG
-  for (i = 0; i < num_clusters; i++) {
-    printf("centroid %d (%d, %d) =>", i, datax(centroids[i].point_id), datay(centroids[i].point_id));
-    for (j = 0, c = 0; j < num_points; j++) {
-      if (i == assigned_to(j)) {
-        printf(" %dx%d", datax(j), datay(j));
-        c++;
-      }
-    }
-    printf("\n");
-    printf("centroid %d (%d, %d) => %d points\n", i, datax(centroids[i].point_id), datay(centroids[i].point_id), c);
-  }
+  for (i = 0; i < num_clusters; i++)
+    printf("centroid %d (%d, %d) => %d points, mean = (%.1lf, %.1lf)\n", i, datax(centroids[i].point_id), datay(centroids[i].point_id), centroids[i].num_points, (double)centroids[i].sum_x / centroids[i].num_points, (double)centroids[i].sum_y / centroids[i].num_points);
   #endif
 }
 
