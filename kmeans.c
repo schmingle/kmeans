@@ -97,18 +97,19 @@ void update_assignments()
     #endif
   }
 
+  #ifdef DEBUG
   for (i = 0; i < num_clusters; i++) {
     printf("centroid %d (%d, %d) =>", i, datax(centroids[i]), datay(centroids[i]));
     for (j = 0, c = 0; j < num_points; j++) {
       if (i == assigned_to(j)) {
         printf(" %dx%d", datax(j), datay(j));
-//        printf(" %d (%d, %d)", j, datax(j), datay(j));
         c++;
       }
     }
     printf("\n");
     printf("centroid %d (%d, %d) => %d points\n", i, datax(centroids[i]), datay(centroids[i]), c);
   }
+  #endif
 }
 
 
