@@ -62,6 +62,9 @@ void update_assignments()
       }
 //      printf("point %d (%.1lf, %.1lf) to centroid %d (%.1lf, %.1lf), min_dist: %.1lf, min_centroid: %d (%.1lf, %.1lf)\n", i, datax(i), datay(i), j, datax(centroids[j]), datay(centroids[j]), min_dist, min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]));
     }
+    point_assignments[i].centroid_id = min_centroid;
+    point_assignments[i].distance = min_dist;
+    printf("point %d (%.1lf, %.1lf) => centroid %d (%.1lf, %.1lf), distance: %.1lf\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]), min_dist);
   }
 }
 
