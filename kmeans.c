@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
   update_assignments();
 
-  return 1;
+  return 0;
 }
 
 
