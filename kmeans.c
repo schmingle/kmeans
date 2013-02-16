@@ -33,6 +33,12 @@ ASSUMPTIONS:
 
 
 typedef struct {
+  uint   point_id;
+  double mean_x;
+  double mean_y;
+} centroid;
+
+typedef struct {
   uint centroid_id;
   uint distance;
   char assigned;
@@ -41,7 +47,7 @@ typedef struct {
 char *input_file_name;
 uint num_points;
 uint num_clusters;
-uint *centroids;
+centroid *centroids;
 uint *data_points;
 assignment *point_assignments;
 
@@ -79,27 +85,27 @@ void update_assignments()
 
   for (i = 0; i < num_points; i++) {
     for (j = 0, d; j < num_clusters; j++) {
-      d = distance(i, centroids[j]);
+      d = distance(i, centroids[j].point_id);
       if (j == 0 || min_dist > d) {
         min_dist = d;
         min_centroid = j;
       }
 
       #ifdef DEBUG
-      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, min_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j]), datay(centroids[j]), min_dist, min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]));
+      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, min_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j].point_id), datay(centroids[j].point_id), min_dist, min_centroid, datax(centroids[min_centroid].point_id), datay(centroids[min_centroid].point_id));
       #endif
     }
     point_assignments[i].centroid_id = min_centroid;
     point_assignments[i].distance = min_dist;
 
     #ifdef DEBUG
-    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid]), datay(centroids[min_centroid]), min_dist);
+    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), min_centroid, datax(centroids[min_centroid].point_id), datay(centroids[min_centroid].point_id), min_dist);
     #endif
   }
 
   #ifdef DEBUG
   for (i = 0; i < num_clusters; i++) {
-    printf("centroid %d (%d, %d) =>", i, datax(centroids[i]), datay(centroids[i]));
+    printf("centroid %d (%d, %d) =>", i, datax(centroids[i].point_id), datay(centroids[i].point_id));
     for (j = 0, c = 0; j < num_points; j++) {
       if (i == assigned_to(j)) {
         printf(" %dx%d", datax(j), datay(j));
@@ -107,7 +113,7 @@ void update_assignments()
       }
     }
     printf("\n");
-    printf("centroid %d (%d, %d) => %d points\n", i, datax(centroids[i]), datay(centroids[i]), c);
+    printf("centroid %d (%d, %d) => %d points\n", i, datax(centroids[i].point_id), datay(centroids[i].point_id), c);
   }
   #endif
 }
@@ -150,7 +156,7 @@ void setup_centroids()
   uint i, j, k, x, y;
 
   // allocate centroids array
-  centroids = (uint *)calloc(num_clusters, sizeof(uint));
+  centroids = (centroid *)calloc(num_clusters, sizeof(centroid));
 
   // pick starting centroids, ensuring uniqueness
   srand((unsigned)time(NULL));
@@ -160,7 +166,7 @@ void setup_centroids()
 
     // take if first one or unassigned
     if (i == 0 || !is_assigned(j)) {
-      centroids[i] = j;
+      centroids[i].point_id = j;
 
       // mark this point (and all points like it) as assigned;
       // this traversal works because we know the data set is sorted
@@ -187,7 +193,7 @@ void setup_centroids()
 
   #ifdef DEBUG
   for (uint i = 0; i < num_clusters; i++)
-    printf("centroids[%d] = %d, %d\n", i, datax(centroids[i]), datay(centroids[i]));
+    printf("centroids[%d] = %d, %d\n", i, datax(centroids[i].point_id), datay(centroids[i].point_id));
   #endif
 }
 
