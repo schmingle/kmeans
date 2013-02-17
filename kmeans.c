@@ -18,7 +18,6 @@ ASSUMPTIONS:
 
 //#define DEBUG
 #define LINE_SIZE  80
-#define BIG_NUM    999999999
 #define FALSE      0
 #define TRUE       1
 
@@ -82,22 +81,25 @@ int main(int argc, char **argv)
 
 void update_assignments()
 {
-  uint i, j, c, d;
-  uint min_dist, nearest_centroid;
+  uint      i, j, d;
+  uint      nearest_centroid;
+  uint64    min_dist;
+  centroid  *cp, *cplast;
 
   // clear out centroids
-  for (i = 0; i < num_clusters; i++) {
-    centroids[i].num_points = 0;
-    centroids[i].sum_x = 0;
-    centroids[i].sum_y = 0;
+  for (cp = centroids, cplast = centroids + num_clusters; cp < cplast; cp++) {
+    cp->num_points = 0;
+    cp->sum_x = 0;
+    cp->sum_y = 0;
   }
 
   // for each data point...
   for (i = 0; i < num_points; i++) {
     // find nearest centroid
     for (j = 0; j < num_clusters; j++) {
+      min_dist = HUGE_VAL;
       d = distance(i, centroids[j].point_id);
-      if (j == 0 || min_dist > d) {
+      if (min_dist > d) {
         min_dist = d;
         nearest_centroid = j;
       }
@@ -122,8 +124,8 @@ void update_assignments()
   }
 
   #ifdef DEBUG
-  for (i = 0; i < num_clusters; i++)
-    printf("centroid %d (%d, %d) => %d points, mean = (%.1lf, %.1lf)\n", i, datax(centroids[i].point_id), datay(centroids[i].point_id), centroids[i].num_points, (double)centroids[i].sum_x / centroids[i].num_points, (double)centroids[i].sum_y / centroids[i].num_points);
+  for (i = 0, cp = centroids, cplast = centroids + num_clusters; cp < cplast; i++, cp++)
+    printf("centroid %d (%d, %d) => %d points, mean = (%.1lf, %.1lf)\n", i, datax(cp->point_id), datay(cp->point_id), cp->num_points, (double)cp->sum_x / cp->num_points, (double)cp->sum_y / cp->num_points);
   #endif
 }
 
