@@ -29,6 +29,7 @@ ASSUMPTIONS:
 #define distance(i, j)   (datax(j) - datax(i)) * (datax(j) - datax(i)) + (datay(j) - datay(i)) * (datay(j) - datay(i))
 #define is_assigned(i)   point_assignments[i].assigned
 #define set_assigned(i)  point_assignments[i].assigned = TRUE
+#define pow2(x)          ((x) * (x))
 
 
 // centroid
@@ -78,9 +79,11 @@ void dbg(const char *fmt, ...);
 
 int main(int argc, char **argv)
 {
-  uint      i, a, b, d, x, y;
-  float     average_improvement;
-  centroid  *cp;
+  uint        i, j, x, y;
+  double      distance_mean, distance_sum;
+  float       average_improvement;
+  assignment  *ap, *ap_last;
+  centroid    *cp;
 
   // usage: ./kmeans /path/to/file num_points num_clusters max_iterations
   input_file_name = argv[1];
@@ -112,17 +115,31 @@ int main(int argc, char **argv)
   dbg("================ DONE! ================\n\n");
   dump_state();
 
-  // dump final centroids
-  // format: x, y, num points, distance to mean
+  // dump final centroids, FORMAT: x, y, num points, p:c distance std dev
+  // calculate standard deviation of point-to-centroid distances
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
-    // calculate distance to mean
-    a = cp->sum_x / cp->num_points;
-    b = cp->sum_y / cp->num_points;
+    // calculate mean distance
+    cp->num_points = 0;
+    distance_sum = 0.0;
+    for (j = 0, ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; j++, ap++) {
+      if (ap->centroid_id != i) continue;
+      cp->num_points++;
+      distance_sum += sqrt(ap->distance);
+    }
+    distance_mean = distance_sum / cp->num_points;
+
+    // calculate summation for sample variance
+    distance_sum = 0.0;
+    for (ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; ap++) {
+      if (ap->centroid_id != i) continue;
+      distance_sum += pow2(sqrt(ap->distance) - distance_mean);
+    }
+
+    // centroid coords
     x = datax(cp->point_id);
     y = datay(cp->point_id);
-    d = (a - x) * (a - x) + (b - y) * (b - y);
 
-    printf("%d\t%d\t%d\t%.1lf\n", x, y, cp->num_points, sqrt((double)d));
+    printf("%d\t%d\t%d\t%.1lf\n", x, y, cp->num_points, sqrt(distance_sum / (cp->num_points - 1)));
   }
 
   return 0;
