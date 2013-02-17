@@ -13,7 +13,7 @@ ASSUMPTIONS:
 #include <math.h>
 #include <time.h>
 
-#define DEBUG
+//#define DEBUG
 #define BIG_NUM          999999999999999999
 #define LINE_SIZE        80
 #define FALSE            0
@@ -255,21 +255,11 @@ void setup_data_points()
     sscanf(line, "%d\t%d", &datax(i), &datay(i));
   }
   fclose(file);
-
-//  #ifdef DEBUG
-//  for (uint i = 0; i < num_points; i++)
-//    printf("data[%d] = %d, %d\n", i, datax(i), datay(i));
-//  #endif
 }
 
 void setup_assignments()
 {
   point_assignments = (assignment *)calloc(num_points, sizeof(assignment));
-
-//  #ifdef DEBUG
-//  for (uint i = 0; i < num_points; i++)
-//    printf("assignments[%d]: centroid_id = %d, distance = %d, assigned = %d\n", i, point_assignments[i].centroid_id, point_assignments[i].distance, point_assignments[i].assigned);
-//  #endif
 }
 
 void setup_centroids()
@@ -321,16 +311,16 @@ void dump_state()
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
     pid = cp->point_id;
     printf("centroids[%d]: point_id = %d (%d, %d), %d points, sum_x = %ld, sum_y = %ld\n", i, pid, datax(pid), datay(pid), cp->num_points, cp->sum_x, cp->sum_y);
-//    printf("centroids[%d]:", i);
-//    for (j = 0, k = 0, ap = point_assignments; j < num_points; j++, ap++) {
-//      if (ap->centroid_id == i) {
-//        if (k && k % 10 == 0)
-//          printf("\n             ");
-//        printf(" %d,%d", datax(j), datay(j));
-//        k++;
-//      }
-//    }
-//    printf("\n");
+    printf("centroids[%d]:", i);
+    for (j = 0, k = 0, ap = point_assignments; j < num_points; j++, ap++) {
+      if (ap->centroid_id == i) {
+        if (k && k % 10 == 0)
+          printf("\n             ");
+        printf(" %d,%d", datax(j), datay(j));
+        k++;
+      }
+    }
+    printf("\n");
   }
   printf("\n");
 }
