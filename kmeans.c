@@ -71,7 +71,7 @@ void dump_state();
 
 int main(int argc, char **argv)
 {
-  uint      i;
+  uint      i, a, b, d, x, y;
   float     average_improvement;
   centroid  *cp;
 
@@ -116,8 +116,16 @@ int main(int argc, char **argv)
   #endif
 
   // dump final centroids
+  // format: x, y, num points, distance to mean
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
-    printf("Cluster %d\t%d\t%d\tBlah\t%d\n", i, datax(cp->point_id), datay(cp->point_id), cp->num_points);
+    // calculate distance to mean
+    a = cp->sum_x / cp->num_points;
+    b = cp->sum_y / cp->num_points;
+    x = datax(cp->point_id);
+    y = datay(cp->point_id);
+    d = (a - x) * (a - x) + (b - y) * (b - y);
+
+    printf("%d\t%d\t%d\t%.1lf\n", x, y, cp->num_points, sqrt((double)d));
   }
 
   return 0;
