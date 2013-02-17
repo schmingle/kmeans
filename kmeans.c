@@ -2,9 +2,10 @@
 
 ASSUMPTIONS:
 
-- data points are 2D
-- data points are positive integers
+- data points are 2D coordinates of positive integers
 - data points are sorted
+- input file has one data point per line, comma-separated (e.g. "%d,%d")
+- input file is sorted numerically (e.g. sort -t, -k 1,1n -k 2,2n)
 
 */
 
