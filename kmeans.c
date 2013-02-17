@@ -27,8 +27,6 @@ ASSUMPTIONS:
 #define distance(i, j)   (datax(j) - datax(i)) * (datax(j) - datax(i)) + (datay(j) - datay(i)) * (datay(j) - datay(i))
 #define is_assigned(i)   point_assignments[i].assigned
 #define set_assigned(i)  point_assignments[i].assigned = TRUE
-#define assign(i, c)     point_assignments[i].centroid_id = c
-#define assigned_to(i)   point_assignments[i].centroid_id
 
 
 typedef struct {
