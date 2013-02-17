@@ -48,9 +48,9 @@ typedef struct {
 
 // node assignment to centroid
 typedef struct {
-  uint  centroid_id;
-  uint  distance;
-  char  assigned;
+  uint    centroid_id;
+  uint64  distance;
+  char    assigned;
 } assignment;
 
 
