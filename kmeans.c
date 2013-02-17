@@ -10,6 +10,7 @@ ASSUMPTIONS:
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <math.h>
 #include <time.h>
 
@@ -67,7 +68,7 @@ void setup_assignments();
 void update_assignments();
 void update_centroids();
 void dump_state();
-
+void dbg(const char *fmt, ...);
 
 int main(int argc, char **argv)
 {
@@ -80,29 +81,21 @@ int main(int argc, char **argv)
   num_points = atoi(argv[2]);
   num_clusters = atoi(argv[3]);
   max_iterations = atoi(argv[4]);
-  #ifdef DEBUG
-  printf("file: %s, num_points: %d, num_clusters: %d\n\n", argv[1], num_points, num_clusters);
-  #endif
+  dbg("file: %s, num_points: %d, num_clusters: %d\n\n", argv[1], num_points, num_clusters);
 
   setup_data_points();
   setup_assignments();
   setup_centroids();
 
-  #ifdef DEBUG
   dump_state();
-  #endif
 
   for (uint i = 0; i < max_iterations; i++) {
-    #ifdef DEBUG
-    printf("================ ITERATION %d ================\n\n", i);
-    #endif
+    dbg("================ ITERATION %d ================\n\n", i);
     update_assignments();
     update_centroids();
     if (improved) {
       average_improvement = improvement / improved;
-      #ifdef DEBUG
-      printf("average improvement: %.1f\n\n", 100.0 * average_improvement);
-      #endif
+      dbg("average improvement: %.1f\n\n", 100.0 * average_improvement);
 
       // done if average improvement is less than 0.1%
       if (average_improvement < 0.001)
@@ -110,10 +103,8 @@ int main(int argc, char **argv)
     }
   }
 
-  #ifdef DEBUG
-  printf("================ DONE! ================\n\n");
+  dbg("================ DONE! ================\n\n");
   dump_state();
-  #endif
 
   // dump final centroids
   // format: x, y, num points, distance to mean
@@ -139,9 +130,7 @@ void update_assignments()
   uint64    min_dist;
   centroid  *cp, *cp_last;
 
-  #ifdef DEBUG
-  printf("*** assigning points to centroids...\n\n");
-  #endif
+  dbg("*** assigning points to centroids...\n\n");
 
   // clear out centroids
   for (cp = centroids, cp_last = centroids + num_clusters; cp < cp_last; cp++) {
@@ -171,9 +160,7 @@ void update_assignments()
     centroids[nearest_centroid].num_points++;
   }
 
-  #ifdef DEBUG
   dump_state();
-  #endif
 }
 
 void update_centroids()
@@ -185,9 +172,7 @@ void update_centroids()
   assignment  *ap;
   centroid    *cp, *cp_last;
 
-  #ifdef DEBUG
-  printf("*** updating centroids...\n\n");
-  #endif
+  dbg("*** updating centroids...\n\n");
 
   // initialize
   for (cp = centroids, cp_last = centroids + num_clusters; cp < cp_last; cp++) {
@@ -201,7 +186,7 @@ void update_centroids()
   for (i = 0, cp = centroids, cp_last = centroids + num_clusters; cp < cp_last; i++, cp++) {
     a = datax(cp->point_id) - cp->target_x;
     b = datay(cp->point_id) - cp->target_y;
-    printf("old centroid %d (%d, %d), target = (%.1lf, %.1lf), distance = %d\n", i, datax(cp->point_id), datay(cp->point_id), cp->target_x, cp->target_y, a * a + b * b);
+    dbg("old centroid %d (%d, %d), target = (%.1lf, %.1lf), distance = %d\n", i, datax(cp->point_id), datay(cp->point_id), cp->target_x, cp->target_y, a * a + b * b);
   }
   #endif
 
@@ -227,25 +212,18 @@ void update_centroids()
   improved = 0;
   improvement = 0.0;
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
-    #ifdef DEBUG
-    printf("new centroid %d (%d, %d), distance: %ld => %ld", i, datax(cp->point_id), datay(cp->point_id), cp->prev_distance, cp->best_distance);
-    #endif
+    dbg("new centroid %d (%d, %d), distance: %ld => %ld", i, datax(cp->point_id), datay(cp->point_id), cp->prev_distance, cp->best_distance);
     if (cp->prev_distance) {
       k = ((float)cp->best_distance - (float)cp->prev_distance) / (float)cp->prev_distance;
       improvement += fabs(k);
       improved++;
-      #ifdef DEBUG
-      printf(" (%.3f%%)", 100.0 * k);
-      #endif
+      dbg(" (%.3f%%)", 100.0 * k);
     }
-    #ifdef DEBUG
-    printf("\n");
-    #endif
+    dbg("\n");
   }
-  #ifdef DEBUG
-  printf("\n");
+  dbg("\n");
+
   dump_state();
-  #endif
 }
 
 void setup_data_points()
@@ -308,27 +286,45 @@ void setup_centroids()
 
 void dump_state()
 {
+#ifdef DEBUG
   uint        i, j, k, pid;
-//  uint        *dp;
   assignment  *ap;
   centroid    *cp;
 
-//  for (i = 0, dp = data_points; i < num_points; i++, dp += 2) {
-//    printf("data[%d]: %d, %d\n", i, *dp, *(dp + 1));
-//  }
+  #if 0
+  // data points
+  for (uint i = 0, *dp = data_points; i < num_points; i++, dp += 2)
+    dbg("data[%d]: %d, %d\n", i, *dp, *(dp + 1));
+  #endif
+
+  // centroids
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
     pid = cp->point_id;
-    printf("centroids[%d]: point_id = %d (%d, %d), %d points, sum_x = %ld, sum_y = %ld\n", i, pid, datax(pid), datay(pid), cp->num_points, cp->sum_x, cp->sum_y);
-    printf("centroids[%d]:", i);
+    dbg("centroids[%d]: point_id = %d (%d, %d), %d points, sum_x = %ld, sum_y = %ld\n", i, pid, datax(pid), datay(pid), cp->num_points, cp->sum_x, cp->sum_y);
+    dbg("centroids[%d]:", i);
     for (j = 0, k = 0, ap = point_assignments; j < num_points; j++, ap++) {
       if (ap->centroid_id == i) {
         if (k && k % 10 == 0)
-          printf("\n             ");
-        printf(" %d,%d", datax(j), datay(j));
+          dbg("\n             ");
+        dbg(" %d,%d", datax(j), datay(j));
         k++;
       }
     }
-    printf("\n");
+    dbg("\n");
   }
-  printf("\n");
+  dbg("\n");
+#endif
+}
+
+/**
+ * same as printf except does nothing when not in DEBUG mode
+ */
+void dbg(const char *fmt, ...)
+{
+#ifdef DEBUG
+  va_list args;
+  va_start(args, fmt);
+  vprintf(fmt, args);
+  va_end(args);
+#endif
 }
