@@ -105,7 +105,7 @@ void update_assignments()
       }
 
       #ifdef DEBUG
-      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %d, nearest_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j].point_id), datay(centroids[j].point_id), min_dist, nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id));
+      printf("point %d (%d, %d) to centroid %d (%d, %d), min_dist: %ld, nearest_centroid: %d (%d, %d)\n", i, datax(i), datay(i), j, datax(centroids[j].point_id), datay(centroids[j].point_id), min_dist, nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id));
       #endif
     }
 
@@ -119,7 +119,7 @@ void update_assignments()
     centroids[nearest_centroid].num_points++;
 
     #ifdef DEBUG
-    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %d\n", i, datax(i), datay(i), nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id), min_dist);
+    printf("point %d (%d, %d) => centroid %d (%d, %d), distance: %ld\n", i, datax(i), datay(i), nearest_centroid, datax(centroids[nearest_centroid].point_id), datay(centroids[nearest_centroid].point_id), min_dist);
     #endif
   }
 
