@@ -20,6 +20,7 @@ ASSUMPTIONS:
 #define FALSE            0
 #define TRUE             1
 
+
 #define uint             unsigned int
 #define uint64           unsigned long
 #define datax(i)         data_points[i * 2]
@@ -29,6 +30,7 @@ ASSUMPTIONS:
 #define set_assigned(i)  point_assignments[i].assigned = TRUE
 
 
+// centroid
 typedef struct {
   uint    point_id;
   uint    num_points;
@@ -42,12 +44,16 @@ typedef struct {
   uint64  best_distance;
 } centroid;
 
+
+// node assignment to centroid
 typedef struct {
   uint  centroid_id;
   uint  distance;
   char  assigned;
 } assignment;
 
+
+// globals!
 char        *input_file_name;
 uint        num_points;
 uint        num_clusters;
@@ -59,14 +65,15 @@ uint        improved = 0;
 float       improvement = 0.0;
 
 
+// prototypes
 void setup_data_points();
 void setup_centroids();
 void setup_assignments();
-
 void update_assignments();
 void update_centroids();
 void dump_state();
 void dbg(const char *fmt, ...);
+
 
 int main(int argc, char **argv)
 {
