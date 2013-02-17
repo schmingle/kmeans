@@ -122,7 +122,9 @@ int main(int argc, char **argv)
   return 0;
 }
 
-
+/**
+ * assign data points to current centroids
+ */
 void update_assignments()
 {
   uint      i, j, d;
@@ -163,6 +165,9 @@ void update_assignments()
   dump_state();
 }
 
+/**
+ * pick new centroids based on mean coordinates in the cluster
+ */
 void update_centroids()
 {
   uint        i, a, b;
@@ -226,6 +231,9 @@ void update_centroids()
   dump_state();
 }
 
+/**
+ * allocate the array for data points and read them in from the input file
+ */
 void setup_data_points()
 {
   FILE *file;
@@ -243,11 +251,17 @@ void setup_data_points()
   fclose(file);
 }
 
+/**
+ * allocate the array for data point to centroid assignments
+ */
 void setup_assignments()
 {
   point_assignments = (assignment *)calloc(num_points, sizeof(assignment));
 }
 
+/**
+ * allocate the array for centroids, then pick the initial centroids
+ */
 void setup_centroids()
 {
   uint i, j, k, x, y;
@@ -284,6 +298,9 @@ void setup_centroids()
     num_clusters = i;
 }
 
+/**
+ * dump the state of things: centroids with assigned data points
+ */
 void dump_state()
 {
 #ifdef DEBUG
