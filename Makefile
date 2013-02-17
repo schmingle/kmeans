@@ -4,7 +4,7 @@ clean:
 	rm kmeans
 
 kmeans: kmeans.c
-	gcc -Wall -std=gnu9x -g -o kmeans kmeans.c
+	gcc -Wall -std=gnu9x -g -o kmeans kmeans.c -lm
 
 test100: default
 	./generate_test_data.sh 100 10000 | sort -t, -k 1,1n -k 2,2n > test100.txt
