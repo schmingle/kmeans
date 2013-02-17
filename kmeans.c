@@ -269,7 +269,7 @@ void setup_data_points()
   file = fopen(input_file_name, "rt");
   for (uint i = 0; i < num_points; i++) {
     fgets(line, LINE_SIZE, file);
-    sscanf(line, "%d\t%d", &datax(i), &datay(i));
+    sscanf(line, "%d,%d", &datax(i), &datay(i));
   }
   fclose(file);
 }
