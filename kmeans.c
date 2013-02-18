@@ -118,28 +118,30 @@ int main(int argc, char **argv)
   // dump final centroids, FORMAT: x, y, num points, p:c distance std dev
   // calculate standard deviation of point-to-centroid distances
   for (i = 0, cp = centroids; i < num_clusters; i++, cp++) {
-    // calculate mean distance
-    cp->num_points = 0;
-    distance_sum = 0.0;
-    for (j = 0, ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; j++, ap++) {
-      if (ap->centroid_id != i) continue;
-      cp->num_points++;
-      distance_sum += sqrt(ap->distance);
-    }
-    distance_mean = distance_sum / cp->num_points;
-
-    // calculate summation for sample variance
-    distance_sum = 0.0;
-    for (ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; ap++) {
-      if (ap->centroid_id != i) continue;
-      distance_sum += pow2(sqrt(ap->distance) - distance_mean);
-    }
-
     // centroid coords
     x = datax(cp->point_id);
     y = datay(cp->point_id);
 
-    printf("%d\t%d\t%d\t%.1lf\n", x, y, cp->num_points, sqrt(distance_sum / (cp->num_points - 1)));
+    if (cp->num_points <= 1) {
+      printf("%d\t%d\t%d\t0.0\n", x, y, cp->num_points);
+    } else {
+      // calculate mean distance
+      distance_sum = 0.0;
+      for (j = 0, ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; j++, ap++) {
+        if (ap->centroid_id != i) continue;
+        distance_sum += sqrt(ap->distance);
+      }
+      distance_mean = distance_sum / cp->num_points;
+
+      // calculate summation for sample variance
+      distance_sum = 0.0;
+      for (ap = point_assignments, ap_last = point_assignments + num_points; ap < ap_last; ap++) {
+        if (ap->centroid_id != i) continue;
+        distance_sum += pow2(sqrt(ap->distance) - distance_mean);
+      }
+
+      printf("%d\t%d\t%d\t%.1lf\n", x, y, cp->num_points, sqrt(distance_sum / (cp->num_points - 1)));
+    }
   }
 
   return 0;
