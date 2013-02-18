@@ -75,7 +75,7 @@ void update_assignments();
 void update_centroids();
 void dump_state();
 void dbg(const char *fmt, ...);
-
+int gettimeofday(struct timeval *restrict tp, void *restrict tzp);
 
 int main(int argc, char **argv)
 {
@@ -288,12 +288,16 @@ void setup_assignments()
 void setup_centroids()
 {
   uint i, j, k, x, y;
+  struct timeval tv;
+
+  // seed rand with microseconds to increase variance if called repeatedly quickly
+  gettimeofday(&tv, NULL);
+  srand(tv.tv_usec);
 
   // allocate centroids array
   centroids = (centroid *)calloc(num_clusters, sizeof(centroid));
 
   // pick starting centroids, ensuring uniqueness
-  srand((unsigned)time(NULL));
   for (i = 0; i < num_clusters; ) {
     // grab a random data point
     j = random() % num_points;
@@ -319,6 +323,13 @@ void setup_centroids()
   // it's possible that the actual number of clusters is less than asked for
   if (i < num_clusters)
     num_clusters = i;
+
+  #ifdef DEBUG
+  for (uint pid = 0, i = 0; i < num_clusters; i++) {
+    pid = centroids[i].point_id;
+    printf("centroids[%d]: point_id = %d (%d, %d)\n", i, pid, datax(pid), datay(pid));
+  }
+  #endif
 }
 
 /**
