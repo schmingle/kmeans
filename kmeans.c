@@ -318,6 +318,11 @@ void setup_centroids()
       // on to next centroid
       i++;
     }
+
+    // done if all assigned
+    for (j = 0; j < num_points; j++)
+      if (!is_assigned(j)) break;
+    if (j >= num_points) break;
   }
 
   // it's possible that the actual number of clusters is less than asked for
