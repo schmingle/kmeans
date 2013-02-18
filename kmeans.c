@@ -73,9 +73,15 @@ void setup_centroids();
 void setup_assignments();
 void update_assignments();
 void update_centroids();
+int gettimeofday(struct timeval *restrict tp, void *restrict tzp);
+
+#ifdef DEBUG
 void dump_state();
 void dbg(const char *fmt, ...);
-int gettimeofday(struct timeval *restrict tp, void *restrict tzp);
+#else
+#define dbg(...)
+#define dump_state()
+#endif
 
 int main(int argc, char **argv)
 {
@@ -342,9 +348,9 @@ void setup_centroids()
 /**
  * dump the state of things: centroids with assigned data points
  */
+#ifdef DEBUG
 void dump_state()
 {
-#ifdef DEBUG
   uint        i, j, k, pid;
   assignment  *ap;
   centroid    *cp;
@@ -371,18 +377,18 @@ void dump_state()
     dbg("\n");
   }
   dbg("\n");
-#endif
 }
+#endif
 
 /**
- * same as printf except does nothing when not in DEBUG mode
+ * same as printf
  */
+#ifdef DEBUG
 void dbg(const char *fmt, ...)
 {
-#ifdef DEBUG
   va_list args;
   va_start(args, fmt);
   vprintf(fmt, args);
   va_end(args);
-#endif
 }
+#endif
