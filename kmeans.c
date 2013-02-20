@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   input_file_name = argv[1];
   num_points = atoi(argv[2]);
   num_clusters = atoi(argv[3]);
-  max_iterations = atoi(argv[4]);
+  max_iterations = (argc > 4 ? atoi(argv[4]) : 20);
   dbg("file: %s, num_points: %d, num_clusters: %d\n\n", argv[1], num_points, num_clusters);
 
   setup_data_points();
