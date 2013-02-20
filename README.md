@@ -17,8 +17,8 @@ gcc -Wall -std=gnu9x -g -o kmeans kmeans.c -lm
 The output format is one centroid per line with tab-separated values:
 ```
 X     Y     # of points  Mean distance of points
-5543	2195	49	         1361.9
-4880	6481	51	         1366.9
+5543  2195  49           1361.9
+4880  6481  51           1366.9
 ```
 
 Usage:
