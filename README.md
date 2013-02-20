@@ -20,3 +20,8 @@ X     Y     # of points  Mean distance of points
 5543	2195	49	         1361.9
 4880	6481	51	         1366.9
 ```
+
+Usage:
+```
+./kmeans DATA_POINTS_FILE NUM_DATA_POINTS NUM_CLUSTERS [MAX_ITERATIONS=20]
+```
